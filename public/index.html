@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+  <title>math.js REST service</title>
+
+  <link href="style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<a href="http://mathjs.org">
+  <img src="http://mathjs.org/css/img/mathjs_165x50.png">
+</a>
+
+<h1>math.js REST service</h1>
+
+<p>
+  This site offers <a href="http://mathjs.org">math.js</a> as a RESTful API.
+</p>
+
+<h2>GET</h2>
+
+<table>
+  <tr>
+    <th>HTTP Request</th><td><code>GET /v1/:expression</code></td>
+  </tr>
+  <tr>
+    <th>Parameters</th><td><code>{number} precision</code></td>
+  </tr>
+</table>
+
+<p>Examples:</p>
+
+<ul>
+  <li><a href="/v1/2*(7-3)">/v1/2*(7-3)</a></li>
+  <li><a href="/v1/2%2F3">/v1/2%2F3</a></li>
+  <li><a href="/v1/2%2F3?precision=3">/v1/2%2F3?precision=3</a></li>
+</ul>
+
+
+<p>
+  <label for="expr1">To try it, enter an expression below, then click the
+    generated url.</label>
+</p>
+
+<table>
+  <tr>
+    <th>Expression</th>
+    <td><input type="text" id="expr1" value="2+3*sqrt(4)" /></td>
+  </tr>
+  <tr>
+    <th>Url</th>
+    <td><a id="link"></a></td>
+  </tr>
+</table>
+
+<h2>POST</h2>
+
+<table>
+  <tr>
+    <th>HTTP Request</th><td><code>POST /v1/</code></td>
+  </tr>
+  <tr>
+    <th>Parameters</th><td><code>{number} precision</code></td>
+  </tr>
+  <tr>
+    <th>Request Body</th><td><code>expression</code></td>
+  </tr>
+</table>
+
+<p>
+  <label for="expr2">To try it, enter an expression below, then click
+    button "Evaluate".</label>
+</p>
+
+<textarea id="expr2" name="expr">
+a = 1.2 * (2 + 4.5)
+a / 2
+
+5.08 cm in inch
+sin(45 deg) ^ 2
+
+9 / 3 + 2i
+
+b = [-1, 2; 3, 1]
+det(b)
+</textarea><br>
+
+<button id="post">Evaluate</button>
+
+<div id="result2"></div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
