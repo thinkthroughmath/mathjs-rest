@@ -23,7 +23,7 @@ post.onclick = function () {
       alert(JSON.stringify(result, null, 2));
     },
     error: function (resp) {
-      alert(resp.responseText);
+      alert('Error: ' + resp.responseText);
     }
   });
 };
