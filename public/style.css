@@ -5,6 +5,8 @@ body {
   font-size: 12px;
   line-height: 1.8;
   color: #363636;
+  max-width: 500px;
+  padding: 20px;
 }
 
 
@@ -24,18 +26,25 @@ table th {
 
 table th,
 table td {
-  padding: 5px 15px;
+  padding: 3px 10px;
   background-color: #f5f5f5;
+  vertical-align: top;
 }
 
 h1 {
-  font-size: 150%;
+  font-size: 200%;
   margin-top: 20px;
 }
 
 h2 {
-  font-size: 120%;
+  font-size: 150%;
   margin-top: 20px;
+  color: #dc3912;
+}
+
+h3 {
+  font-size: 100%;
+  font-weight: bold;
 }
 
 p {
@@ -58,7 +67,7 @@ textarea {
 
 textarea {
   width: 300px;
-  height: 180px;
+  height: 200px;
 }
 
 a {

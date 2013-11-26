@@ -8,34 +8,59 @@
 <body>
 
 <a href="http://mathjs.org">
-  <img src="http://mathjs.org/css/img/mathjs_165x50.png">
+  <img src="http://mathjs.org/css/img/mathjs_330x100.png" width="300" height="100" alt="logo">
 </a>
 
-<h1>math.js REST service</h1>
+<h1>math.js RESTful web service</h1>
 
 <p>
-  This site offers <a href="http://mathjs.org">math.js</a> as a RESTful API.
+  This site offers <a href="http://mathjs.org">math.js</a> as a RESTful web service.
 </p>
 
 <h2>GET</h2>
 
+<h3>HTTP Request</h3>
+
+<code>GET /v1/</code>
+
+<h3>Query parameters</h3>
+
 <table>
   <tr>
-    <th>HTTP Request</th><td><code>GET /v1/:expression</code></td>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Required</th>
+    <th>Description</th>
   </tr>
   <tr>
-    <th>Parameters</th><td><code>{number} precision</code></td>
+    <td>expr</td>
+    <td>string</td>
+    <td>yes</td>
+    <td>The expression to be evaluated.</td>
+  </tr>
+  <tr>
+    <td>precision</td>
+    <td>number</td>
+    <td>no</td>
+    <td>Number of significant digits in formatted output. Undefined by default.</td>
   </tr>
 </table>
 
-<p>Examples:</p>
+<h3>Response</h3>
+
+On success, the response will have status 200 and the body contains the result of the expression.
+On failure, the response will have status 400 with an error message in the body.
+
+<h3>Examples</h3>
 
 <ul>
-  <li><a href="/v1/2*(7-3)">/v1/2*(7-3)</a></li>
-  <li><a href="/v1/2%2F3">/v1/2%2F3</a></li>
-  <li><a href="/v1/2%2F3?precision=3">/v1/2%2F3?precision=3</a></li>
+  <li><a href="/v1/?expr=2*(7-3)">/v1/?expr=2*(7-3)</a></li>
+  <li><a href="/v1/?expr=2%2F3">/v1/?expr=2%2F3</a></li>
+  <li><a href="/v1/?expr=2%2F3&precision=3">/v1/?expr=2%2F3&precision=3</a></li>
 </ul>
 
+
+<h3>Try it</h3>
 
 <p>
   <label for="expr1">To try it, enter an expression below, then click the
@@ -49,23 +74,77 @@
   </tr>
   <tr>
     <th>Url</th>
-    <td><a id="link"></a></td>
+    <td><a id="link"><span style="color: gray;">loading...</span></a></td>
   </tr>
 </table>
 
 <h2>POST</h2>
 
+<h3>HTTP Request</h3>
+
+<code>POST /v1/</code>
+
+<h3>Request Body</h3>
+
+<p>
+  The request body must contain a JSON Object with the following fields:
+</p>
+
 <table>
   <tr>
-    <th>HTTP Request</th><td><code>POST /v1/</code></td>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Required</th>
+    <th>Description</th>
   </tr>
   <tr>
-    <th>Parameters</th><td><code>{number} precision</code></td>
+    <td>expr</td>
+    <td>string or string[]</td>
+    <td>yes</td>
+    <td>A string containing the expression to be evaluated, or an array
+    with strings to be evaluated</td>
   </tr>
   <tr>
-    <th>Request Body</th><td><code>expression</code></td>
+    <td>precision</td>
+    <td>number</td>
+    <td>no</td>
+    <td>Number of significant digits in formatted output. Undefined by default.</td>
   </tr>
 </table>
+
+<h3>Response</h3>
+
+<p>
+  The response is a JSON object containing the following fields:
+</p>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>result</td>
+    <td>string, string[], or null</td>
+    <td>
+      On success, the field <code>result</code> contains a string with
+      the results of the expression. If an array with expressions was provided,
+      the result will be a an array with a string for each expression.
+      On failure, <code>result</code> will be <code>null</code>.
+    </td>
+  </tr>
+  <tr>
+    <td>error</td>
+    <td>string or null</td>
+    <td>On failure, <code>error</code> will contain an error message.
+      On success, <code>error</code> will be <code>null</code>.
+    </td>
+  </tr>
+</table>
+
+
+<h3>Try it</h3>
 
 <p>
   <label for="expr2">To try it, enter an expression below, then click
@@ -73,16 +152,18 @@
 </p>
 
 <textarea id="expr2" name="expr">
-a = 1.2 * (2 + 4.5)
-a / 2
-
-5.08 cm in inch
-sin(45 deg) ^ 2
-
-9 / 3 + 2i
-
-b = [-1, 2; 3, 1]
-det(b)
+{
+  "expr": [
+    "a = 1.2 * (2 + 4.5)",
+    "a / 2",
+    "5.08 cm in inch",
+    "sin(45 deg) ^ 2",
+    "9 / 3 + 2i",
+    "b = [-1, 2; 3, 1]",
+    "det(b)"
+  ],
+  "precision": 14
+}
 </textarea><br>
 
 <button id="post">Evaluate</button>
