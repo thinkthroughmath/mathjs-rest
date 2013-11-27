@@ -63,6 +63,12 @@ input[type=text],
 textarea {
   border: 1px solid lightgray;
   padding: 5px;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+input[type=text] {
+  width: 300px;
 }
 
 textarea {

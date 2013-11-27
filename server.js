@@ -74,37 +74,45 @@ process.on('uncaughtException', function(err) {
   console.trace();
 });
 
+// create an instance of math.js
+var math = mathjs();
+
+// disable the import function so the math.js instance cannot be changed
+math.import({
+  'import': function () {
+    throw new Error('function import is disabled.');
+  }
+}, {
+  override: true
+});
 
 /**
  * Evaluate an expression
  * @param {{expr: string | string[], precision: number | null}} params
- * @return {string | string[]} results
+ * @return {string | string[]} result
  */
 function evaluate (params) {
+  var result;
+
   // TODO: validate params.expr
   // TODO: validate params.precision
-  // TODO: improve performance. Right now we reload the mathjs library for every evaluation
-
-  var math = mathjs();
-
-  var results;
 
   if (Array.isArray(params.expr)) {
     var scope = {};
-    results = params.expr.map(function (expr) {
-      var result = math.eval(expr, scope);
-      return math.format(result, params.precision)
+    result = params.expr.map(function (expr) {
+      var r = math.eval(expr, scope);
+      return math.format(r, params.precision)
     });
   }
   else {
-    var result = math.eval(params.expr);
-    results = math.format(result, params.precision);
+    var r = math.eval(params.expr);
+    result = math.format(r, params.precision);
   }
 
-  return results;
+  return result;
 }
 
-
+// start the server
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
   console.log('Listening on port ' + port);
