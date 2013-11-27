@@ -6,7 +6,7 @@ var expr1 = document.getElementById('expr1'),
 expr1.oninput = function () {
   var url = '/v1/?expr=' + encodeURIComponent(expr1.value);
   link.href = url;
-  link.innerHTML = url;
+  link.innerHTML = 'http://api.mathjs.org' + url;
 };
 expr1.oninput();
 
