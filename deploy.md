@@ -1,3 +1,7 @@
+Update to the latest libraries (including mathjs itself)
+
+    npm update
+
 To deploy to heroku:
 
     git push heroku master
