@@ -1,7 +1,10 @@
 var express = require('express'),
-    mathjs = require('mathjs');
+    workerpool = require('workerpool');
 
-var app = express();
+var app = express(),
+    pool = workerpool.pool(__dirname + '/mathWorker.js');
+
+var TIMEOUT = 10000; // milliseconds
 
 // use logger and enable compression
 app.use(express.logger());
@@ -30,43 +33,59 @@ app.get('/v1/*', function (req, res) {
     return;
   }
 
-  try {
-    var result = evaluate({
-      expr: req.query.expr,
-      precision: req.query.precision ? parseFloat(req.query.precision) : undefined
-    });
+  var params = {
+    expr: req.query.expr,
+    precision: req.query.precision ? parseFloat(req.query.precision) : undefined
+  };
 
-    res.send(result);
-  }
-  catch (err) {
-    res.send(400, err.toString());
-  }
+  pool.exec('evaluate', [params])
+      .timeout(TIMEOUT)
+      .then(function (result) {
+        res.send(result);
+      })
+      .catch(function (err) {
+        res.send(400, formatError(err));
+      });
 });
 
 // POST requests
 app.post('/v1/*', function (req, res) {
-  try {
-    var params = JSON.parse(req.rawBody);
+  var params = JSON.parse(req.rawBody);
 
-    if (params.expr === undefined) {
-      res.send(400, 'Error: Required field "expr" missing in JSON body.');
-      return;
-    }
-
-    var result = evaluate(params);
-
-    res.send( {
-      result: result,
-      error: null
-    });
+  if (params.expr === undefined) {
+    res.send(400, 'Error: Required field "expr" missing in JSON body.');
+    return;
   }
-  catch (err) {
-    res.send({
-      result: null,
-      error: err.toString()
-    });
-  }
+
+  pool.exec('evaluate', [params])
+      .timeout(TIMEOUT)
+      .then(function (result) {
+        res.send({
+          result: result,
+          error: null
+        });
+      })
+      .catch(function (err) {
+        res.send(400, {
+          result: null,
+          error: formatError(err)
+        });
+      });
 });
+
+/**
+ * Format error messages as string
+ * @param {Error} err
+ * @return {String} message
+ */
+function formatError (err) {
+  if (err instanceof workerpool.Promise.TimeoutError) {
+    return 'TimeoutError: Evaluation exceeded maximum duration of ' + TIMEOUT / 1000 + ' seconds';
+  }
+  else {
+    return err.toString();
+  }
+}
 
 // handle uncached exceptions so the application cannot crash
 process.on('uncaughtException', function(err) {
@@ -74,47 +93,8 @@ process.on('uncaughtException', function(err) {
   console.trace();
 });
 
-// create an instance of math.js
-var math = mathjs();
-
-// disable the import function so the math.js instance cannot be changed
-math.import({
-  'import': function () {
-    throw new Error('function import is disabled.');
-  }
-}, {
-  override: true
-});
-
-/**
- * Evaluate an expression
- * @param {{expr: string | string[], precision: number | null}} params
- * @return {string | string[]} result
- */
-function evaluate (params) {
-  var result;
-
-  // TODO: validate params.expr
-  // TODO: validate params.precision
-
-  if (Array.isArray(params.expr)) {
-    var scope = {};
-    result = params.expr.map(function (expr) {
-      var r = math.eval(expr, scope);
-      return math.format(r, params.precision)
-    });
-  }
-  else {
-    var r = math.eval(params.expr);
-    result = math.format(r, params.precision);
-  }
-
-  return result;
-}
-
 // start the server
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
   console.log('Listening on port ' + port);
 });
-

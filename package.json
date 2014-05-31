@@ -2,8 +2,9 @@
   "name": "mathjs-rest",
   "version": "0.2.0",
   "dependencies": {
-    "express": "~3.1.2",
-    "mathjs": "0.22.0"
+    "express": "^3.1.2",
+    "mathjs": "^0.22.0",
+    "workerpool": "^1.0.0"
   },
   "engines": {
     "node": "0.10.x",
