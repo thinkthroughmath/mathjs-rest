@@ -1,6 +1,9 @@
 var express = require('express'),
     workerpool = require('workerpool');
 
+// load new relic (for logging)
+require('newrelic');
+
 var app = express(),
     pool = workerpool.pool(__dirname + '/mathWorker.js');
 
