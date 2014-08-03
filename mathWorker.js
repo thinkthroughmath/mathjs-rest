@@ -1,8 +1,5 @@
-var mathjs = require('mathjs'),
+var math = require('mathjs'),
     workerpool = require('workerpool');
-
-// create an instance of math.js
-var math = mathjs();
 
 // disable the import function so the math.js instance cannot be changed
 math.import({
