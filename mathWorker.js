@@ -2,13 +2,10 @@ var math = require('mathjs'),
     workerpool = require('workerpool');
 
 // disable the import function so the math.js instance cannot be changed
-math.import({
-  'import': function () {
-    throw new Error('function import is disabled.');
-  }
-}, {
-  override: true
-});
+function noImport() {
+  throw new Error('function import is disabled.');
+}
+math.import({'import': noImport}, {override: true});
 
 /**
  * Evaluate an expression
