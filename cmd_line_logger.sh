@@ -4,5 +4,5 @@
 
 while read "line"
 do
-  nc -w0 -u ${RAILS_SYSLOG_SERVER} ${RAILS_SYSLOG_PORT} <<< "<0>${ROLE_ID}: ${line}"
+  nc -w0 -u ${SYSLOG_SERVER} ${SYSLOG_PORT} <<< "<0>${ROLE_ID}: ${line}"
 done
