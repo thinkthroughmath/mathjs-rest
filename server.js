@@ -102,15 +102,26 @@ function evaluate (params) {
     var scope = {};
     result = params.expr.map(function (expr) {
       var r = math.eval(expr, scope);
-      return math.format(r, params.precision)
+      return math.format(r, options(params));
     });
   }
   else {
     var r = math.eval(params.expr);
-    result = math.format(r, params.precision);
+    result = math.format(r, options(params));
   }
 
   return result;
+}
+
+function options (params) {
+  var opts = {};
+  if(params.precision){
+    opts.precision = params.precision;
+  }
+  if(params.notation){
+    opts.notation = params.notation;
+  }
+  return opts;
 }
 
 // start the server
