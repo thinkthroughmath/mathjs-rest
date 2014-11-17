@@ -1,6 +1,7 @@
 require('newrelic')
 var express = require('express'),
-    mathjs = require('mathjs');
+    mathjs = require('mathjs'),
+    strongParams = require('params');
 
 var app = express();
 
@@ -48,6 +49,9 @@ app.get('/v1/*', function (req, res) {
 app.post('/v1/*', function (req, res) {
   try {
     var params = JSON.parse(req.rawBody);
+    params = strongParams(params).only(['expr', 'precision', 'notation', 'exponential']);
+    var exponential = strongParams(params.exponential || {}).only(['lower', 'upper']);
+    params.exponential = exponential;
 
     if (params.expr === undefined) {
       res.send(400, 'Error: Required field "expr" missing in JSON body.');
@@ -114,14 +118,7 @@ function evaluate (params) {
 }
 
 function options (params) {
-  var opts = {};
-  if(params.precision){
-    opts.precision = params.precision;
-  }
-  if(params.notation){
-    opts.notation = params.notation;
-  }
-  return opts;
+  return strongParams(params).except('expr');
 }
 
 // start the server
