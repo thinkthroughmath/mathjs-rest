@@ -49,7 +49,7 @@ app.get('/v1/*', function (req, res) {
 app.post('/v1/*', function (req, res) {
   try {
     var params = JSON.parse(req.rawBody);
-    params = strongParams(params).only(['expr', 'precision', 'notation', 'exponential']);
+    params = strongParams(params).only(['expr', 'significantDigits', 'scale', 'precision', 'notation', 'exponential']);
     var exponential = strongParams(params.exponential || {}).only(['lower', 'upper']);
     params.exponential = exponential;
 
@@ -118,7 +118,26 @@ function evaluate (params) {
 }
 
 function options (params) {
-  return strongParams(params).except('expr');
+  var opts = strongParams(params).except('expr');
+
+  if(opts.significantDigits){
+    return opts.significantDigits;
+  }
+
+  if(opts.scale){
+    var scale = {
+      precision: opts.scale,
+      notation: opts.notation || 'fixed'
+    };
+    return mergeOptions(params, scale);
+  }
+
+  return opts;
+}
+
+function mergeOptions (obj1, obj2) {
+  for (var attrname in obj2) { obj1[attrname] = obj2[attrname]; }
+  return obj1;
 }
 
 // start the server
