@@ -137,7 +137,8 @@ function options (params) {
       precision: opts.scale,
       notation: opts.notation || 'fixed'
     };
-    return mergeOptions(params, scale);
+    opts = strongParams(opts).except('scale');
+    return mergeOptions(opts, scale);
   }
 
   return opts;
