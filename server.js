@@ -1,9 +1,16 @@
-require('newrelic')
+'use strict';
+
+require('newrelic');
 var express = require('express'),
     mathjs = require('mathjs'),
     strongParams = require('params');
 
+// express configuration
+var port = process.env.PORT || 5000;
+
+// library instances
 var app = express();
+var math = mathjs();
 
 // use logger and enable compression
 app.use(express.logger());
@@ -49,16 +56,17 @@ app.get('/v1/*', function (req, res) {
 app.post('/v1/*', function (req, res) {
   try {
     var params = JSON.parse(req.rawBody);
+    var result;
+
     params = strongParams(params).only(['expr', 'significantDigits', 'scale', 'precision', 'notation', 'exponential']);
-    var exponential = strongParams(params.exponential || {}).only(['lower', 'upper']);
-    params.exponential = exponential;
+    params.exponential = strongParams(params.exponential || {}).only(['lower', 'upper']);
 
     if (params.expr === undefined) {
       res.send(400, 'Error: Required field "expr" missing in JSON body.');
       return;
     }
 
-    var result = evaluate(params);
+    result = evaluate(params);
 
     res.send( {
       result: result,
@@ -79,9 +87,6 @@ process.on('uncaughtException', function(err) {
   console.trace();
 });
 
-// create an instance of math.js
-var math = mathjs();
-
 // disable the import function so the math.js instance cannot be changed
 math.import({
   'import': function () {
@@ -97,21 +102,23 @@ math.import({
  * @return {string | string[]} result
  */
 function evaluate (params) {
-  var result;
+  var scope,
+      result,
+      evaluatedResult;
 
   // TODO: validate params.expr
   // TODO: validate params.precision
 
   if (Array.isArray(params.expr)) {
-    var scope = {};
+    scope = {};
     result = params.expr.map(function (expr) {
       var r = math.eval(expr, scope);
       return math.format(r, options(params));
     });
   }
   else {
-    var r = math.eval(params.expr);
-    result = math.format(r, options(params));
+    evaluatedResult = math.eval(params.expr);
+    result = math.format(evaluatedResult, options(params));
   }
 
   return result;
@@ -119,13 +126,14 @@ function evaluate (params) {
 
 function options (params) {
   var opts = strongParams(params).except('expr');
+  var scale = {};
 
   if(opts.significantDigits){
     return opts.significantDigits;
   }
 
   if(opts.scale){
-    var scale = {
+    scale = {
       precision: opts.scale,
       notation: opts.notation || 'fixed'
     };
@@ -141,8 +149,6 @@ function mergeOptions (obj1, obj2) {
 }
 
 // start the server
-var port = process.env.PORT || 5000;
 app.listen(port, function() {
   console.log('Listening on port ' + port);
 });
-
