@@ -2,7 +2,7 @@
 
 require('newrelic');
 var express = require('express'),
-    mathjs = require('mathjs'),
+    evaluate = require('./evaluate'),
     strongParams = require('params');
 
 // express configuration
@@ -10,7 +10,6 @@ var port = process.env.PORT || 5000;
 
 // library instances
 var app = express();
-var math = mathjs();
 
 // use logger and enable compression
 app.use(express.logger());
@@ -40,7 +39,7 @@ app.get('/v1/*', function (req, res) {
   }
 
   try {
-    var result = evaluate({
+    var result = evaluate.evaluate({
       expr: req.query.expr,
       precision: req.query.precision ? parseFloat(req.query.precision) : undefined
     });
@@ -66,7 +65,7 @@ app.post('/v1/*', function (req, res) {
       return;
     }
 
-    result = evaluate(params);
+    result = evaluate.evaluate(params);
 
     res.send( {
       result: result,
@@ -86,68 +85,6 @@ process.on('uncaughtException', function(err) {
   console.log('Caught exception: ' + err);
   console.trace();
 });
-
-// disable the import function so the math.js instance cannot be changed
-math.import({
-  'import': function () {
-    throw new Error('function import is disabled.');
-  }
-}, {
-  override: true
-});
-
-/**
- * Evaluate an expression
- * @param {{expr: string | string[], precision: number | null}} params
- * @return {string | string[]} result
- */
-function evaluate (params) {
-  var scope,
-      result,
-      evaluatedResult;
-
-  // TODO: validate params.expr
-  // TODO: validate params.precision
-
-  if (Array.isArray(params.expr)) {
-    scope = {};
-    result = params.expr.map(function (expr) {
-      var r = math.eval(expr, scope);
-      return math.format(r, options(params));
-    });
-  }
-  else {
-    evaluatedResult = math.eval(params.expr);
-    result = math.format(evaluatedResult, options(params));
-  }
-
-  return result;
-}
-
-function options (params) {
-  var opts = strongParams(params).except('expr');
-  var scale = {};
-
-  if(opts.significantDigits){
-    return opts.significantDigits;
-  }
-
-  if(opts.scale){
-    scale = {
-      precision: opts.scale,
-      notation: opts.notation || 'fixed'
-    };
-    opts = strongParams(opts).except('scale');
-    return mergeOptions(opts, scale);
-  }
-
-  return opts;
-}
-
-function mergeOptions (obj1, obj2) {
-  for (var attrname in obj2) { obj1[attrname] = obj2[attrname]; }
-  return obj1;
-}
 
 // start the server
 app.listen(port, function() {
