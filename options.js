@@ -2,7 +2,6 @@ var strongParams = require('params');
 
 module.exports = {
   filter: function(params) {
-    var _this = this;
     var opts = strongParams(params).except('expr');
     var scale = {};
 
@@ -16,7 +15,7 @@ module.exports = {
         notation: opts.notation || 'fixed'
       };
       opts = strongParams(opts).except('scale');
-      return _this.mergeOptions(opts, scale);
+      return this.mergeOptions(opts, scale);
     }
 
     return opts;
