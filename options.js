@@ -1,4 +1,5 @@
-var strongParams = require('params');
+var strongParams = require('params'),
+               _ = require('underscore');
 
 module.exports = {
   filter: function(params) {
@@ -15,14 +16,9 @@ module.exports = {
         notation: opts.notation || 'fixed'
       };
       opts = strongParams(opts).except('scale');
-      return this.mergeOptions(opts, scale);
+      return _.extend(opts, scale);
     }
 
     return opts;
   },
-
-  mergeOptions: function(obj1, obj2) {
-    for (var attrname in obj2) { obj1[attrname] = obj2[attrname]; }
-    return obj1;
-  }
 };
