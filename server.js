@@ -118,7 +118,7 @@ function evaluate(params) {
   return result;
 }
 
-// handle uncached exceptions so the application cannot crash
+// handle uncaught exceptions so the application cannot crash
 process.on('uncaughtException', function(err) {
   console.log('Caught exception: ' + err);
   console.trace();
