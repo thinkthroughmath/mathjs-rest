@@ -4,10 +4,21 @@
   "dependencies": {
     "express": "~3.1.2",
     "mathjs": "0.21.0",
-    "newrelic": "1.12.x"
+    "newrelic": "1.12.x",
+    "params": "^0.1.1",
+    "underscore": "^1.7.0"
   },
   "engines": {
     "node": "0.10.x",
     "npm": "1.2.x"
+  },
+  "devDependencies": {
+    "mocha": "^2.0.1",
+    "should": "^4.3.0",
+    "mocha-jenkins-reporter": "^0.1.3"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha tests",
+    "jenkins-test": "JUNIT_REPORT_PATH=tests/report.xml JUNIT_REPORT_STACK=2 ./node_modules/.bin/mocha tests --reporter mocha-jenkins-reporter"
   }
 }
