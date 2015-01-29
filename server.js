@@ -1,5 +1,8 @@
 'use strict';
 
+// load new relic (for logging)
+require('newrelic');
+
 var express      = require('express'),
     options      = require('./options'),
     strongParams = require('params'),
@@ -7,9 +10,6 @@ var express      = require('express'),
 
 // express configuration
 var port = process.env.PORT || 5000;
-
-// load new relic (for logging)
-require('newrelic');
 
 var app = express(),
     pool = workerpool.pool(__dirname + '/mathWorker.js');
