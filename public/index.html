@@ -14,10 +14,10 @@
 <h1>math.js web service</h1>
 
 <p>
-  This site offers <a href="http://mathjs.org">math.js</a> as a RESTful API.
+  <a href="http://mathjs.org">math.js</a> is available as a RESTful API. Evaluations can be done via <a href="#get">GET</a> or <a href="#post">POST</a> requests. The duration per evaluation is limited to 10 seconds.
 </p>
 
-<h2>GET</h2>
+<h2 id="get">GET</h2>
 
 <h3>HTTP Request</h3>
 
@@ -81,7 +81,7 @@ On failure, the response will have status 400 with an error message in the body.
   </tr>
 </table>
 
-<h2>POST</h2>
+<h2 id="post">POST</h2>
 
 <h3>HTTP Request</h3>
 
@@ -169,7 +169,7 @@ On failure, the response will have status 400 with an error message in the body.
 }
 </textarea><br>
 
-<button id="post">Evaluate</button>
+<button id="postButton">Evaluate</button>
 
 <div id="result2"></div>
 

@@ -1,7 +1,7 @@
 var expr1 = document.getElementById('expr1'),
     expr2 = document.getElementById('expr2'),
     link = document.getElementById('link'),
-    post = document.getElementById('post');
+    post = document.getElementById('postButton');
 
 expr1.oninput = function () {
   var url = '/v1/?expr=' + encodeURIComponent(expr1.value);
