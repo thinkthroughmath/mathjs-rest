@@ -9,7 +9,7 @@
   "dependencies": {
     "express": "^3.1.2",
     "mathjs": "^1.2.0",
-    "newrelic": "1.12.x",
+    "newrelic": "1.25.x",
     "params": "^0.1.1",
     "underscore": "^1.7.0",
     "workerpool": "^1.0.0"
