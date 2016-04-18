@@ -3,17 +3,15 @@
 // load new relic (for logging)
 require('newrelic');
 
-var express      = require('express'),
+const express    = require('express'),
     options      = require('./options'),
     strongParams = require('params'),
-    workerpool   = require('workerpool');
+    cluster      = require('cluster'),
+    mathWorker   = require('./mathWorker'),
+    numCPUs      = require('os').cpus().length;
 
-function startServer() {
-  // express configuration
-  var port = process.env.PORT || 5000;
-
-  var app = express(),
-      pool = workerpool.pool(__dirname + '/mathWorker.js');
+function startServer(port) {
+  var app = express();
 
   var TIMEOUT = 10000; // milliseconds
 
@@ -49,14 +47,12 @@ function startServer() {
       precision: req.query.precision ? parseFloat(req.query.precision) : undefined
     };
 
-    pool.exec('evaluate', [params])
-      .timeout(TIMEOUT)
-      .then(function (result) {
-        res.send(result);
-      })
-      .catch(function (err) {
-        res.send(400, formatError(err));
-      });
+    try {
+      var result = mathWorker.evaluate(params);
+      res.send(result);
+    } catch(e) {
+      res.send(400, formatError(e));
+    }
   });
 
   // POST requests
@@ -71,20 +67,18 @@ function startServer() {
       return;
     }
 
-    pool.exec('evaluate', [params])
-      .timeout(TIMEOUT)
-      .then(function (result) {
-        res.send({
-          result: result,
-          error: null
-        });
-      })
-      .catch(function (err) {
-        res.send(400, {
-          result: null,
-          error: formatError(err)
-        });
+    try {
+      var result = mathWorker.evaluate(params);
+      res.send({
+        result: result,
+        error: null
       });
+    } catch(e) {
+      res.send(400, {
+        result: null,
+        error: formatError(e)
+      });
+    }
   });
 
   /**
@@ -93,12 +87,7 @@ function startServer() {
    * @return {String} message
    */
   function formatError (err) {
-    if (err instanceof workerpool.Promise.TimeoutError) {
-      return 'TimeoutError: Evaluation exceeded maximum duration of ' + TIMEOUT / 1000 + ' seconds';
-    }
-    else {
-      return err.toString();
-    }
+    return err.toString();
   }
 
   // handle uncaught exceptions so the application cannot crash
@@ -113,4 +102,16 @@ function startServer() {
   });
 }
 
-startServer();
+if (cluster.isMaster) {
+  // Fork workers.
+  for (var i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+} else {
+  var port = process.env.PORT || 5000;
+  startServer(port);
+}
