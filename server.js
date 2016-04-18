@@ -13,13 +13,9 @@ const express    = require('express'),
 function startServer(port) {
   var app = express();
 
-  var TIMEOUT = 10000; // milliseconds
-
-  // use logger and enable compression
   app.use(express.logger());
   app.use(express.compress());
 
-  // parse raw request body
   app.use(function(req, res, next) {
     var data = '';
     req.setEncoding('utf8');
@@ -32,10 +28,8 @@ function startServer(port) {
     });
   });
 
-  // route static files
   app.use(express.static(__dirname + '/public'));
 
-  // GET requests
   app.get('/v1/*', function (req, res) {
     if (req.query.expr === undefined) {
       res.send(400, 'Error: Required query parameter "expr" missing in url.');
@@ -55,7 +49,6 @@ function startServer(port) {
     }
   });
 
-  // POST requests
   app.post('/v1/*', function (req, res) {
     var params = JSON.parse(req.rawBody);
 
@@ -90,20 +83,17 @@ function startServer(port) {
     return err.toString();
   }
 
-  // handle uncaught exceptions so the application cannot crash
   process.on('uncaughtException', function(err) {
     console.log('Caught exception: ' + err);
     console.trace();
   });
 
-  // start the server
   app.listen(port, function() {
     console.log('Listening on port ' + port);
   });
 }
 
 if (cluster.isMaster) {
-  // Fork workers.
   for (var i = 0; i < numCPUs; i++) {
     cluster.fork();
   }
