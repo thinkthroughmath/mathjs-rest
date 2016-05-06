@@ -1,6 +1,5 @@
 var math       = require('mathjs'),
-    options    = require('./options'),
-    workerpool = require('workerpool');
+    options    = require('./options');
 
 // disable the import function so the math.js instance cannot be changed
 function noImport() {
@@ -34,7 +33,6 @@ function evaluate(params) {
   return result;
 }
 
-// create a worker and register public functions
-workerpool.worker({
+module.exports = {
   evaluate: evaluate
-});
+};
