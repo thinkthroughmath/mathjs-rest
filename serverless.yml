@@ -1,0 +1,23 @@
+service: serverless-mathjs
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: us-east-1
+  profile: serverlessjs-deployer
+
+functions:
+  app:
+    handler: server.handler
+    timeout: 30
+    events:
+      - http:
+          path: /v1/{any+} # this matches the base path
+          method: GET
+      - http:
+          path: /v1/{any+} # this matches any path, the token 'any' doesn't mean anything special
+          method: POST
+
+plugins:
+  - serverless-offline
