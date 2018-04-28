@@ -12,12 +12,8 @@ functions:
     handler: server.handler
     timeout: 30
     events:
-      - http:
-          path: /v1/{any+} # this matches the base path
-          method: GET
-      - http:
-          path: /v1/{any+} # this matches any path, the token 'any' doesn't mean anything special
-          method: POST
+      - http: ANY /v1
+      - http: 'ANY {proxy+}'
 
 plugins:
   - serverless-offline
