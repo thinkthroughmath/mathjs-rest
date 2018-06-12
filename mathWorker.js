@@ -1,12 +1,6 @@
 var math       = require('mathjs'),
     options    = require('./options');
 
-// disable the import function so the math.js instance cannot be changed
-function noImport() {
-  throw new Error('function import is disabled.');
-}
-math.import({'import': noImport}, {override: true});
-
 /**
  * Evaluate an expression
  * @param {{expr: string | string[], precision: number | null}} params
