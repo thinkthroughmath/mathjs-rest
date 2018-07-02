@@ -21,9 +21,7 @@ provider:
 functions:
   app:
     handler: server.handler
-    warmup:
-      - prod
-      - dev
+    warmup: {opt:stage, 'dev'}
     timeout: 30
     events:
       - http: ANY /v1
