@@ -74,4 +74,12 @@ function formatError (err) {
   return err.toString();
 }
 
-module.exports.handler = serverless(app);
+const handler = serverless(app);
+
+module.exports.handler = function(event, context, callback) {
+  if (event.source === 'serverless-plugin-warmup') {
+    console.log('WarmUP - Lambda is warm!')
+    return callback(null, 'Lambda is warm!')
+  }
+  return handler(event, context, callback);
+};

@@ -6,10 +6,24 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: us-east-1
   profile: serverlessjs-deployer
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'lambda:InvokeFunction'
+      Resource:
+      - Fn::Join:
+        - ':'
+        - - arn:aws:lambda
+          - Ref: AWS::Region
+          - Ref: AWS::AccountId
+          - function:${self:service}-${opt:stage, self:provider.stage}-*
 
 functions:
   app:
     handler: server.handler
+    warmup:
+      - prod
+      - dev
     timeout: 30
     events:
       - http: ANY /v1
@@ -17,3 +31,11 @@ functions:
 
 plugins:
   - serverless-offline
+  - serverless-plugin-warmup
+
+custom:
+  warmup:
+    memorySize: 128
+    schedule: 'rate(15 minutes)'
+    timeout: 20
+    prewarm: true
